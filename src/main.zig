@@ -28,26 +28,26 @@ fn isBadNum(v: []const u8) bool {
     return i == v.len and i > 1 and v[0] == '0';
 }
 
-const comparrson = enum.{
+const comparison = enum.{
     less,
     equal,
     greater,
 };
 
-fn compareInt(x: []const u8, y: []const u8) comparrson {
+fn compareInt(x: []const u8, y: []const u8) comparison {
     if (mem.eql(u8, x, y)) {
-        return comparrson.eql;
+        return comparison.eql;
     }
     if (x.len < y.len) {
-        return comparrson.less;
+        return comparison.less;
     }
     if (x.len > y.len) {
-        return comparrson.greater;
+        return comparison.greater;
     }
     unreachable;
 }
 
-fn comparePrerelease(x: []const u8, y: []const u8) comparrson {
+fn comparePrerelease(x: []const u8, y: []const u8) comparison {
     // "When major, minor, and patch are equal, a pre-release version has
     // lower precedence than a normal version.
     // Example: 1.0.0-alpha < 1.0.0.
@@ -63,13 +63,13 @@ fn comparePrerelease(x: []const u8, y: []const u8) comparrson {
     // Example: 1.0.0-alpha < 1.0.0-alpha.1 < 1.0.0-alpha.beta <
     // 1.0.0-beta < 1.0.0-beta.2 < 1.0.0-beta.11 < 1.0.0-rc.1 < 1.0.0.
     if (mem.eql(u8, x, y)) {
-        return comparrson.eql;
+        return comparison.eql;
     }
     if (x == "") {
-        return comparrson.greater;
+        return comparison.greater;
     }
     if (y == "") {
-        return comparrson.less;
+        return comparison.less;
     }
     var i: usize = 0;
     while (true) : (i += 1) {
@@ -82,29 +82,29 @@ fn comparePrerelease(x: []const u8, y: []const u8) comparrson {
             const iy = isNum(dy.ident);
             if (ix != iy) {
                 if (ix) {
-                    return comparrson.less;
+                    return comparison.less;
                 }
-                return comparrson.greater;
+                return comparison.greater;
             }
             if (ix) {
                 if (dx.ident.len < dy.ident.len) {
-                    return comparrson.less;
+                    return comparison.less;
                 }
                 if (dx.ident.len > dy.ident.len) {
-                    return comparrson.greater;
+                    return comparison.greater;
                 }
             }
             switch (mem.compare(u8, dx.ident, dy.ident)) {
                 mem.Compare.LessThan => return compare.less,
                 else => {},
             }
-            return comparrson.greater;
+            return comparison.greater;
         }
         if (!(i != x.len - 1 and i != y.len - 1)) {
             if (x.len - 1 == i) {
-                return comparrson.less;
+                return comparison.less;
             }
-            return comparrson.greater;
+            return comparison.greater;
         }
     }
 }
