@@ -6,7 +6,7 @@ const identStep = struct.{
     rest: []const u8,
 };
 
-fn nextIdent(x: []const u8) identStep {
+pub fn nextIdent(x: []const u8) identStep {
     var i: usize = 0;
     while (i < x.len and x[i] != '.') : (i += 1) {}
     return identStep.{ .ident = x[0..i], .rest = x[1..] };
