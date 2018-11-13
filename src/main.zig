@@ -1,7 +1,7 @@
 const std = @import("std");
 const mem = std.mem;
 
-const identStep = struct.{
+const identStep = struct {
     ident: []const u8,
     rest: []const u8,
 };
@@ -9,7 +9,7 @@ const identStep = struct.{
 pub fn nextIdent(x: []const u8) identStep {
     var i: usize = 0;
     while (i < x.len and x[i] != '.') : (i += 1) {}
-    return identStep.{ .ident = x[0..i], .rest = x[1..] };
+    return identStep{ .ident = x[0..i], .rest = x[1..] };
 }
 
 fn isIdentChar(c: u8) bool {
@@ -28,7 +28,7 @@ fn isBadNum(v: []const u8) bool {
     return i == v.len and i > 1 and v[0] == '0';
 }
 
-const comparison = enum.{
+const comparison = enum {
     less,
     equal,
     greater,
