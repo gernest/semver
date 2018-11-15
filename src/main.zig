@@ -116,3 +116,40 @@ fn comparePrerelease(x: []const u8, y: []const u8) comparison {
         }
     }
 }
+
+pub const Version = struct {
+    major: []const u8,
+    minor: []const u8,
+    patch: []const u8,
+    short: []const u8,
+    pre_release: []const u8,
+    build: []const u8,
+};
+
+pub fn parse(v: []const u8) !Version {
+    if (v.len == 0) {
+        return error.EmptyString;
+    }
+    if (v[0] != 'v') {
+        return error.MissingVersionPrefix;
+    }
+    var version: Version = undefined;
+    if (parseInt(v[1..])) |value| {
+        version.major = value;
+    } else {
+        return error.BadMajorVersion;
+    }
+    return version;
+}
+
+fn parseInt(v: []const u8) ![]const u8 {
+    if (v.len == 0) {
+        return error.NaN;
+    }
+    if (v[0] < '0' or '9' < v[0]) {
+        return error.Nan;
+    }
+    var i: usize = 0;
+    while (i < v.len and '0' <= v[i] and v[i] <= '9') : (i += 1) {}
+    return v[0..i];
+}
