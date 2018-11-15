@@ -124,6 +124,22 @@ pub const Version = struct {
     short: []const u8,
     pre_release: []const u8,
     build: []const u8,
+
+    pub fn compare(self: Version, v: Version) Comparison {
+        const major = compareInt(self.major, v.major);
+        if (major != Comparison.Equal) {
+            return major;
+        }
+        const minor = compareInt(self.minor, v.minor);
+        if (minor != Comparison.Equal) {
+            return minor;
+        }
+        const patch = compareInt(self.patch, v.patch);
+        if (patch != Comparison.Equal) {
+            return patch;
+        }
+        return comparePrerelease(self.pre_release, v.pre_release);
+    }
 };
 
 pub fn parse(v: []const u8) !Version {
