@@ -121,9 +121,9 @@ pub const Version = struct {
     major: []const u8,
     minor: []const u8,
     patch: []const u8,
-    short: []const u8,
-    pre_release: []const u8,
-    build: []const u8,
+    short: ?[]const u8,
+    pre_release: ?[]const u8,
+    build: ?[]const u8,
 
     pub fn compare(self: Version, v: Version) Comparison {
         const major = compareInt(self.major, v.major);
@@ -154,6 +154,27 @@ pub fn parse(v: []const u8) !Version {
         version.major = value;
     } else {
         return error.BadMajorVersion;
+    }
+    var n: usize = 1 + version.major.len;
+    if (n == v.len) {
+        version.minor = "0";
+        version.patch = "0";
+        version.short = ".0";
+        return version;
+    }
+    if (v[n] != '.') {
+        return error.BadMinorPrefix;
+    }
+    if (parseInt(v[n..])) |value| {
+        version.minor = value;
+    } else {
+        return error.BadMinorVersion;
+    }
+    n += version.minor.len;
+    if (n == v.len) {
+        version.patch = "0";
+        version.short = ".0";
+        return version;
     }
     return version;
 }
