@@ -1,3 +1,11 @@
+// This was ported from golang tools repo, it makes ense to include the license
+//
+// Copyright 2018 The Go Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+//
+// Copyright 2018 Geofrey Ernest
+
 const std = @import("std");
 const mem = std.mem;
 
