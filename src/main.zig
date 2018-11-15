@@ -176,6 +176,9 @@ pub fn parse(v: []const u8) !Version {
         version.short = ".0";
         return version;
     }
+    if (v[n] != '.') {
+        return error.BadPatchPrefix;
+    }
     return version;
 }
 
