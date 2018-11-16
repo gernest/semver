@@ -193,3 +193,12 @@ fn parseInt(v: []const u8) ![]const u8 {
     while (i < v.len and '0' <= v[i] and v[i] <= '9') : (i += 1) {}
     return v[0..i];
 }
+
+// returns true if v is a valid semvar string and false otherwise.
+pub fn isValid(v: []const u8) bool {
+    if (parse(v)) |_| {
+        return true;
+    } else {
+        return false;
+    }
+}
