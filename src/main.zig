@@ -152,7 +152,7 @@ pub fn parse(v: []const u8) !Version {
     var version: Version = undefined;
     if (parseInt(v[1..])) |value| {
         version.major = value;
-    } else {
+    } else |err| {
         return error.BadMajorVersion;
     }
     var n: usize = 1 + version.major.len;
@@ -167,7 +167,7 @@ pub fn parse(v: []const u8) !Version {
     }
     if (parseInt(v[n..])) |value| {
         version.minor = value;
-    } else {
+    } else |err| {
         return error.BadMinorVersion;
     }
     n += version.minor.len;
@@ -181,7 +181,7 @@ pub fn parse(v: []const u8) !Version {
     }
     if (parseInt(v[n..])) |value| {
         version.patch = value;
-    } else {
+    } else |err| {
         return error.BadPatchVersion;
     }
     return version;
@@ -203,7 +203,7 @@ fn parseInt(v: []const u8) ![]const u8 {
 pub fn isValid(v: []const u8) bool {
     if (parse(v)) |_| {
         return true;
-    } else {
+    } else |err| {
         return false;
     }
 }
