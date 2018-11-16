@@ -166,7 +166,6 @@ pub fn parse(v: []const u8) !Version {
     if (n >= v.len) {
         version.minor = "0";
         version.patch = "0";
-        version.short = ".0";
         return version;
     }
     if (v[n] != '.') {
@@ -180,7 +179,6 @@ pub fn parse(v: []const u8) !Version {
     n += 1 + version.minor.len;
     if (n >= v.len) {
         version.patch = "0";
-        version.short = ".0";
         return version;
     }
     if (v[n] != '.') {
