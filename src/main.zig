@@ -179,6 +179,11 @@ pub fn parse(v: []const u8) !Version {
     if (v[n] != '.') {
         return error.BadPatchPrefix;
     }
+    if (parseInt(v[n..])) |value| {
+        version.patch = value;
+    } else {
+        return error.BadPatchVersion;
+    }
     return version;
 }
 
