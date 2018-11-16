@@ -128,7 +128,6 @@ pub const Version = struct {
     major: []const u8,
     minor: []const u8,
     patch: []const u8,
-    short: ?[]const u8,
     pre_release: ?[]const u8,
     build: ?[]const u8,
 
