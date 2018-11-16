@@ -196,6 +196,13 @@ pub fn parse(v: []const u8) !Version {
     if (n < v.len and v[n] == '-') {
         version.pre_release = try parsePreRelease(v[n..]);
     }
+    n += 1;
+    if (version.pre_release) |value| {
+        n += 1 + value.len;
+    }
+    if (n < v.len and v[n] == '+') {
+        version.build = try parseBuild(v[n..]);
+    }
     return version;
 }
 
@@ -204,7 +211,6 @@ fn parseInt(v: []const u8) ![]const u8 {
         return error.NaN;
     }
     if (v[0] < '0' or '9' < v[0]) {
-        warn("some fish {}\n", v);
         return error.Nan;
     }
     var i: usize = 0;
@@ -233,6 +239,31 @@ fn parsePreRelease(v: []const u8) ![]const u8 {
     }
     if (start == i or isBadNum(v[start..i])) {
         return error.BadPrerelease;
+    }
+    return v[1..i];
+}
+
+fn parseBuild(v: []const u8) ![]const u8 {
+    if (v.len == 0 or v[0] != '+') {
+        return error.BadBuild;
+    }
+
+    var i: usize = 1;
+    var start: usize = 1;
+    while (i < v.len) {
+        if (!isIdentChar(v[i])) {
+            return error.BadBuild;
+        }
+        if (v[i] == '.') {
+            if (start == i) {
+                return error.BadBuild;
+            }
+            start = i + 1;
+        }
+        i += 1;
+    }
+    if (start == i) {
+        return error.BadBuild;
     }
     return v[1..i];
 }

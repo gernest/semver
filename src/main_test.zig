@@ -1,5 +1,6 @@
 const semver = @import("main.zig");
 const t = @import("./util/index.zig");
+const warn = @import("std").debug.warn;
 
 test "is valid" {
     const testCase = struct {
@@ -46,4 +47,6 @@ test "is valid" {
             _ = t.terrorf("version: {} expected {} got {}", ts.v, ts.valid, ok);
         }
     }
+    // const p = try semver.parse("v1.2.3-pre+meta");
+    // warn("{}", p);
 }
