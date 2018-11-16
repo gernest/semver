@@ -8,6 +8,7 @@
 
 const std = @import("std");
 const mem = std.mem;
+const warn = std.debug.warn;
 
 const identStep = struct {
     ident: []const u8,
@@ -55,7 +56,19 @@ fn compareInt(x: []const u8, y: []const u8) Comparison {
     unreachable;
 }
 
-fn comparePrerelease(x: []const u8, y: []const u8) Comparison {
+fn comparePrerelease(x: ?[]const u8, y: ?[]const u8) Comparison {
+
+    // safely handle null pre releases
+    if (x == null and y == null) {
+        return Comparison.Equal;
+    }
+    if (x == null and y != null) {
+        return Comparison.GreaterThan;
+    }
+    if (x != null and y == null) {
+        return Comparison.LessThan;
+    }
+
     // "When major, minor, and patch are equal, a pre-release version has
     // lower precedence than a normal version.
     // Example: 1.0.0-alpha < 1.0.0.
@@ -70,19 +83,13 @@ fn comparePrerelease(x: []const u8, y: []const u8) Comparison {
     // identifiers are equal.
     // Example: 1.0.0-alpha < 1.0.0-alpha.1 < 1.0.0-alpha.beta <
     // 1.0.0-beta < 1.0.0-beta.2 < 1.0.0-beta.11 < 1.0.0-rc.1 < 1.0.0.
-    if (mem.eql(u8, x, y)) {
+    if (mem.eql(u8, x.?, y.?)) {
         return Comparison.Equal;
-    }
-    if (x == "") {
-        return Comparison.GreaterThan;
-    }
-    if (y == "") {
-        return Comparison.LessThan;
     }
     var i: usize = 0;
     while (true) : (i += 1) {
-        var xx = x[i..];
-        var yy = y[i..];
+        var xx = x.?[i..];
+        var yy = y.?[i..];
         var dx = nextIdent(xx);
         var dy = nextIdent(yy);
         if (!mem.eql(u8, dx.ident, dy.ident)) {
@@ -103,13 +110,13 @@ fn comparePrerelease(x: []const u8, y: []const u8) Comparison {
                 }
             }
             switch (mem.compare(u8, dx.ident, dy.ident)) {
-                mem.Compare.LessThan => return compare.less,
+                mem.Compare.LessThan => return Comparison.LessThan,
                 else => {},
             }
             return Comparison.GreaterThan;
         }
-        if (!(i != x.len - 1 and i != y.len - 1)) {
-            if (x.len - 1 == i) {
+        if (!(i != x.?.len - 1 and i != y.?.len - 1)) {
+            if (x.?.len - 1 == i) {
                 return Comparison.LessThan;
             }
             return Comparison.GreaterThan;
@@ -150,13 +157,14 @@ pub fn parse(v: []const u8) !Version {
         return error.MissingVersionPrefix;
     }
     var version: Version = undefined;
-    if (parseInt(v[1..])) |value| {
+    var n: usize = 1;
+    if (parseInt(v[n..])) |value| {
         version.major = value;
     } else |err| {
         return error.BadMajorVersion;
     }
-    var n: usize = 1 + version.major.len;
-    if (n == v.len) {
+    n += version.major.len;
+    if (n >= v.len - 1) {
         version.minor = "0";
         version.patch = "0";
         version.short = ".0";
@@ -165,13 +173,13 @@ pub fn parse(v: []const u8) !Version {
     if (v[n] != '.') {
         return error.BadMinorPrefix;
     }
-    if (parseInt(v[n..])) |value| {
+    if (parseInt(v[n + 1 ..])) |value| {
         version.minor = value;
     } else |err| {
         return error.BadMinorVersion;
     }
     n += version.minor.len;
-    if (n == v.len) {
+    if (n >= v.len - 1) {
         version.patch = "0";
         version.short = ".0";
         return version;
@@ -179,7 +187,7 @@ pub fn parse(v: []const u8) !Version {
     if (v[n] != '.') {
         return error.BadPatchPrefix;
     }
-    if (parseInt(v[n..])) |value| {
+    if (parseInt(v[n + 1 ..])) |value| {
         version.patch = value;
     } else |err| {
         return error.BadPatchVersion;
@@ -192,6 +200,7 @@ fn parseInt(v: []const u8) ![]const u8 {
         return error.NaN;
     }
     if (v[0] < '0' or '9' < v[0]) {
+        warn("some fish {}\n", v);
         return error.Nan;
     }
     var i: usize = 0;
