@@ -157,14 +157,14 @@ pub fn parse(v: []const u8) !Version {
         return error.MissingVersionPrefix;
     }
     var version: Version = undefined;
-    var n: usize = 1;
-    if (parseInt(v[n..])) |value| {
+    var n: usize = 0;
+    if (parseInt(v[n + 1 ..])) |value| {
         version.major = value;
     } else |err| {
         return error.BadMajorVersion;
     }
-    n += version.major.len;
-    if (n >= v.len - 1) {
+    n += 1 + version.major.len;
+    if (n >= v.len) {
         version.minor = "0";
         version.patch = "0";
         version.short = ".0";
@@ -178,8 +178,8 @@ pub fn parse(v: []const u8) !Version {
     } else |err| {
         return error.BadMinorVersion;
     }
-    n += version.minor.len;
-    if (n >= v.len - 1) {
+    n += 1 + version.minor.len;
+    if (n >= v.len) {
         version.patch = "0";
         version.short = ".0";
         return version;
@@ -191,6 +191,10 @@ pub fn parse(v: []const u8) !Version {
         version.patch = value;
     } else |err| {
         return error.BadPatchVersion;
+    }
+    n += 1 + version.patch.len;
+    if (n < v.len and v[n] == '-') {
+        version.pre_release = try parsePreRelease(v[n..]);
     }
     return version;
 }
@@ -206,6 +210,31 @@ fn parseInt(v: []const u8) ![]const u8 {
     var i: usize = 0;
     while (i < v.len and '0' <= v[i] and v[i] <= '9') : (i += 1) {}
     return v[0..i];
+}
+
+fn parsePreRelease(v: []const u8) ![]const u8 {
+    if (v.len == 0 or v[0] != '-') {
+        return error.BadPrerelease;
+    }
+
+    var i: usize = 1;
+    var start: usize = 1;
+    while (i < v.len and v[i] != '+') {
+        if (!isIdentChar(v[i]) and v[i] != '.') {
+            return error.BadPrerelease;
+        }
+        if (v[i] == '.') {
+            if (start == i or isBadNum(v[start..])) {
+                return error.BadPrerelease;
+            }
+            start = i + 1;
+        }
+        i += 1;
+    }
+    if (start == i or isBadNum(v[start..i])) {
+        return error.BadPrerelease;
+    }
+    return v[1..i];
 }
 
 // returns true if v is a valid semvar string and false otherwise.
