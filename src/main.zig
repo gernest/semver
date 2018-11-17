@@ -4,7 +4,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 //
-// Copyright 2018 Geofrey Ernest
+// Copyright 2018 Geofrey Ernest MIT LICENSE
 
 const std = @import("std");
 const mem = std.mem;
