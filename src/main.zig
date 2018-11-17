@@ -37,11 +37,17 @@ fn isBadNum(v: []const u8) bool {
     return i == v.len and i > 1 and v[0] == '0';
 }
 
-const Comparison = enum {
+pub const Comparison = enum {
     LessThan,
     Equal,
     GreaterThan,
 };
+
+pub fn compare(x: []const u8, y: []const u8) !Comparison {
+    var a = try parse(x);
+    var b = try parse(y);
+    return a.compare(b);
+}
 
 fn compareInt(x: []const u8, y: []const u8) Comparison {
     if (mem.eql(u8, x, y)) {
@@ -53,7 +59,13 @@ fn compareInt(x: []const u8, y: []const u8) Comparison {
     if (x.len > y.len) {
         return Comparison.GreaterThan;
     }
-    unreachable;
+    const cmp = mem.compare(u8, x, y);
+    return switch (cmp) {
+        mem.Compare.LessThan => Comparison.LessThan,
+        mem.Compare.Equal => Comparison.Equal,
+        mem.Compare.GreaterThan => Comparison.GreaterThan,
+        else => unreachable,
+    };
 }
 
 fn comparePrerelease(x: ?[]const u8, y: ?[]const u8) Comparison {
