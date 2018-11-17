@@ -146,6 +146,28 @@ pub const Version = struct {
         }
         return comparePrerelease(self.pre_release, v.pre_release);
     }
+
+    /// print writes semantic version string to the stream. stream should
+    /// implement io.OutStream intreface.
+    /// This prefixes the version string with v. The output takes the following
+    /// form
+    ///     v{major}.{minor}.{patch}-{pre_release}+{build}
+    pub fn print(self: Version, stream: var) !void {
+        const fmt = "v{}.{}.{}";
+        try stream.print(fmt, self.major, self.minor, self.patch);
+        if (self.pre_release) |value| {
+            try stream.print("-{}", value);
+        }
+        if (self.build) |value| {
+            try stream.print("+{}", value);
+        }
+    }
+
+    /// printBuffer is like print but wites the version string to buffer.
+    pub fn printBuffer(self: Version, buf: *std.Buffer) !void {
+        var b = std.io.BufferOutStream.init(buf);
+        try self.print(&b.stream);
+    }
 };
 
 pub fn parse(v: []const u8) !Version {
