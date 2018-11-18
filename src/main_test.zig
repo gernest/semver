@@ -395,3 +395,11 @@ test "print" {
         buf.shrink(0);
     }
 }
+
+test "parse without v prefix" {
+    _ = try semver.parse("1.2.3");
+    _ = try semver.parse("1.2.3-pre");
+    _ = try semver.parse("1.2.3-pre+meta");
+    _ = try semver.parse("1.2");
+    _ = try semver.parse("1");
+}
