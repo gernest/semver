@@ -227,9 +227,8 @@ pub fn parse(v: []const u8) !Version {
     if (n < v.len and v[n] == '-') {
         version.pre_release = try parsePreRelease(v[n..]);
     }
-    n += 1;
     if (version.pre_release) |value| {
-        n += value.len;
+        n += 1 + value.len;
     }
     if (n < v.len and v[n] == '+') {
         version.build = try parseBuild(v[n..]);
