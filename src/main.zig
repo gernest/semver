@@ -186,17 +186,18 @@ pub fn parse(v: []const u8) !Version {
     if (v.len == 0) {
         return error.EmptyString;
     }
-    if (v[0] != 'v') {
-        return error.MissingVersionPrefix;
+    var n: usize = 0;
+    var x = n;
+    if (v[0] == 'v') {
+        x += 1;
     }
     var version: Version = undefined;
-    var n: usize = 0;
-    if (parseInt(v[n + 1 ..])) |value| {
+    if (parseInt(v[x..])) |value| {
         version.major = value;
     } else |err| {
         return error.BadMajorVersion;
     }
-    n += 1 + version.major.len;
+    n += x + version.major.len;
     if (n >= v.len) {
         version.minor = "0";
         version.patch = "0";
