@@ -1,4 +1,5 @@
 # semver
+[![Build Status](https://travis-ci.org/gernest/semver.svg?branch=master)](https://travis-ci.org/gernest/semver)
 
 semantic versioning for zig
 
