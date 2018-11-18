@@ -1,4 +1,4 @@
-// This was ported from golang tools repo, it makes ense to include the license
+// This was ported from golang/go repo, it makes ense to include the license
 //
 // Copyright 2018 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
