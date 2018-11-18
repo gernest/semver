@@ -1,11 +1,3 @@
-# semver
-
-semantic versioning for zig
-
-
-## usage
-
-```
 const semver = @import("src/main.zig");
 const warn = @import("std").debug.warn;
 
@@ -18,4 +10,3 @@ test "parse version string to a struct" {
     // OK
     // All tests passed.
 }
-```
