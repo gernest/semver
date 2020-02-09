@@ -1,8 +1,11 @@
 language: minimal
+
 install:
-  - wget https://ziglang.org/builds/zig-linux-x86_64-0.3.0+5b3f7a8e.tar.xz
-  - tar xf zig-linux-x86_64-0.3.0+5b3f7a8e.tar.xz
-  - mv zig-linux-x86_64-0.3.0+5b3f7a8e bin
+  - apt install jq
+  - curl https://ziglang.org/download/index.json | jq -r '.master."x86_64-linux".tarball' | wget -i - -O tarball.tar.xz
+  - tar xf tarball.tar.xz
+  - mv zig-linux-x86_64-*/ bin
+
 script:
   - ./bin/zig test src/main_test.zig
   - ./bin/zig test example.zig
