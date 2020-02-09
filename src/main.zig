@@ -59,11 +59,11 @@ fn compareInt(x: []const u8, y: []const u8) Comparison {
     if (x.len > y.len) {
         return Comparison.GreaterThan;
     }
-    const cmp = mem.compare(u8, x, y);
+    const cmp = mem.order(u8, x, y);
     return switch (cmp) {
-        mem.Compare.LessThan => Comparison.LessThan,
-        mem.Compare.Equal => Comparison.Equal,
-        mem.Compare.GreaterThan => Comparison.GreaterThan,
+        .lt => Comparison.LessThan,
+        .eq => Comparison.Equal,
+        .gt => Comparison.GreaterThan,
         else => unreachable,
     };
 }
@@ -121,8 +121,8 @@ fn comparePrerelease(x: ?[]const u8, y: ?[]const u8) Comparison {
                     return Comparison.GreaterThan;
                 }
             }
-            switch (mem.compare(u8, dx.ident, dy.ident)) {
-                mem.Compare.LessThan => return Comparison.LessThan,
+            switch (mem.order(u8, dx.ident, dy.ident)) {
+                .lt => return Comparison.LessThan,
                 else => {},
             }
             return Comparison.GreaterThan;
@@ -166,12 +166,12 @@ pub const Version = struct {
     ///     v{major}.{minor}.{patch}-{pre_release}+{build}
     pub fn print(self: Version, stream: var) !void {
         const fmt = "v{}.{}.{}";
-        try stream.print(fmt, self.major, self.minor, self.patch);
+        try stream.print(fmt, .{self.major, self.minor, self.patch});
         if (self.pre_release) |value| {
-            try stream.print("-{}", value);
+            try stream.print("-{}", .{value});
         }
         if (self.build) |value| {
-            try stream.print("+{}", value);
+            try stream.print("+{}", .{value});
         }
     }
 
