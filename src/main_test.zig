@@ -9,7 +9,7 @@ const testCase = struct {
     valid: bool,
 };
 
-const test_cases = []testCase{
+const test_cases = [_]testCase{
     testCase{ .v = "bad", .valid = false },
     testCase{ .v = "v1-alpha.beta.gamma", .valid = false },
     testCase{ .v = "v1-pre", .valid = false },
@@ -46,7 +46,7 @@ test "is valid" {
     for (test_cases) |ts| {
         const ok = semver.isValid(ts.v);
         if (ok != ts.valid) {
-            try t.terrorf("version: {} expected {} got {}", ts.v, ts.valid, ok);
+            try t.terrorf("version: {} expected {} got {}", .{ts.v, ts.valid, ok});
         }
     }
 }
@@ -57,7 +57,7 @@ const compareTest = struct {
     cmp: semver.Comparison,
 };
 
-const compare_tests = []compareTest{
+const compare_tests = [_]compareTest{
     compareTest{ .x = "v1.0.0-alpha", .y = "v1.0.0-alpha", .cmp = semver.Comparison.Equal },
     compareTest{ .x = "v1.0.0-alpha.1", .y = "v1.0.0-alpha", .cmp = semver.Comparison.GreaterThan },
     compareTest{ .x = "v1.0.0-alpha.1", .y = "v1.0.0-alpha.1", .cmp = semver.Comparison.Equal },
@@ -348,7 +348,7 @@ test "compare" {
     for (compare_tests) |ts, i| {
         const cmp = try semver.compare(ts.x, ts.y);
         if (ts.cmp != cmp) {
-            try t.terrorf("{} [{} ,{}]expected {} got {}", i, ts.x, ts.y, ts.cmp, cmp);
+            try t.terrorf("{} [{} ,{}]expected {} got {}", .{i, ts.x, ts.y, ts.cmp, cmp});
         }
     }
 }
@@ -358,7 +358,7 @@ const printTest = struct {
     expect: []const u8,
 };
 
-const print_tests = []printTest{
+const print_tests = [_]printTest{
     printTest{ .src = "v1.0.0-alpha", .expect = "v1.0.0-alpha" },
     printTest{ .src = "v1.0.0-alpha.1", .expect = "v1.0.0-alpha.1" },
     printTest{ .src = "v1.0.0-alpha.beta", .expect = "v1.0.0-alpha.beta" },
@@ -384,13 +384,13 @@ const print_tests = []printTest{
 };
 
 test "print" {
-    var buf = try std.Buffer.init(std.debug.global_allocator, "");
+    var buf = try std.Buffer.init(std.testing.allocator, "");
     defer buf.deinit();
     for (print_tests) |ts| {
         const v = try semver.parse(ts.src);
         try v.printBuffer(&buf);
         if (!mem.eql(u8, buf.toSlice(), ts.expect)) {
-            _ = t.terrorf("expected {} got {} {}", ts.expect, buf.toSlice(), v);
+            try t.terrorf("expected {} got {} {}", .{ts.expect, buf.toSlice(), v});
         }
         buf.shrink(0);
     }
